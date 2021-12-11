@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as math;
 
@@ -29,27 +27,35 @@ class RoundedButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Container(
           height: 56,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                transform: GradientRotation(
-                  math.radians(780),
-                ),
-                stops: const [
-                  0.05,
-                  0.4,
-                  0.85,
-                ],
-                colors: const [
-                  Color(0xFFF99500),
-                  Color(0xFFFF4B6C),
-                  Color(0xFFDE22E9),
-                ]),
-            borderRadius: BorderRadius.circular(16),
-          ),
+          decoration:
+              onPressed != null ? _colorfullDecoration : _disabledDecoration,
           alignment: Alignment.center,
           child: child,
         ),
       ),
     );
   }
+
+  BoxDecoration get _colorfullDecoration => BoxDecoration(
+        gradient: LinearGradient(
+            transform: GradientRotation(
+              math.radians(780),
+            ),
+            stops: const [
+              0.05,
+              0.4,
+              0.85,
+            ],
+            colors: const [
+              Color(0xFFF99500),
+              Color(0xFFFF4B6C),
+              Color(0xFFDE22E9),
+            ]),
+        borderRadius: BorderRadius.circular(16),
+      );
+
+  BoxDecoration get _disabledDecoration => BoxDecoration(
+        color: const Color(0xFFEFF2F4),
+        borderRadius: BorderRadius.circular(16),
+      );
 }

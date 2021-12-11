@@ -1,8 +1,10 @@
-import 'package:family_space_flutter/pages/home_page.dart';
+import 'package:family_space_flutter/bloc/login/login_bloc.dart';
+import 'package:family_space_flutter/bloc/login/login_event.dart';
+import 'package:family_space_flutter/bloc/login/login_state.dart';
 import 'package:family_space_flutter/text_styles.dart';
 import 'package:family_space_flutter/widgets/rounded_button.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -15,55 +17,50 @@ class LoginPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 32,
-          vertical: 24,
-        ),
-        child: Column(
-          children: [
-            Text('Укажите ваш номер телефона', style: TextStyles.h1),
-            const SizedBox(height: 24),
-            TextField(
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                border: _border,
-                enabledBorder: _border,
-                focusedBorder: _border,
-                hintText: 'Номер телефона',
-              ),
+      body: BlocBuilder<LoginBloc, LoginState>(
+        builder: (_, s) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 32,
+              vertical: 24,
             ),
-            Expanded(child: Container()),
-            RoundedButton(
-              onPressed: () async {
-                if (await Permission.location.isDenied) {
-                  final result = await Permission.location.request();
-                  if (result == PermissionStatus.granted) {
-                    if (await Permission.location.serviceStatus.isEnabled) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
-                      );
-                    }
-                  }
-                } else {
-                  if (await Permission.location.serviceStatus.isEnabled) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
-                  }
-                }
-              },
-              child: Text(
-                'Продолжить',
-                style: TextStyles.h2.copyWith(
-                  color: Colors.white,
+            child: Column(
+              children: [
+                Text('Укажите ваш номер телефона', style: TextStyles.h1),
+                const SizedBox(height: 24),
+                TextField(
+                  onChanged: (text) {
+                    BlocProvider.of<LoginBloc>(context)
+                        .add(LoginEvent.enterPhone(text));
+                  },
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    border: _border,
+                    enabledBorder: _border,
+                    focusedBorder: _border,
+                    hintText: 'Номер телефона',
+                  ),
                 ),
-              ),
+                Expanded(child: Container()),
+                RoundedButton(
+                  onPressed: s.isPhoneNumberValid
+                      ? () {
+                          BlocProvider.of<LoginBloc>(context)
+                              .add(const LoginEvent.login());
+                          Navigator.of(context).maybePop();
+                        }
+                      : null,
+                  child: Text(
+                    'Продолжить',
+                    style: TextStyles.h2.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
